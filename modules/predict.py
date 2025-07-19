@@ -4,7 +4,7 @@ import pandas as pd
 import logging
 import json
 
-# Определим корень проекта (два уровня вверх от текущего файла)
+
 current_file = os.path.realpath(__file__)
 project_root = os.path.dirname(os.path.dirname(current_file))  # modules → project
 
@@ -13,12 +13,12 @@ model_dir = os.path.join(project_root, "data", "models")
 test_dir = os.path.join(project_root, "data", "test")
 pred_dir = os.path.join(project_root, "data", "predictions")
 
-# Настройка логирования
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 def load_latest_model(model_folder: str):
-    """Загружает последнюю по времени модель из папки"""
+
     pkl_files = [f for f in os.listdir(model_folder) if f.endswith(".pkl")]
     if not pkl_files:
         raise FileNotFoundError("Файл модели не найден")
@@ -32,7 +32,7 @@ def load_latest_model(model_folder: str):
 
 
 def load_test_data(test_folder: str) -> list[pd.DataFrame]:
-    """Загружает все CSV и JSON (включая одиночные объекты) из папки test"""
+
     files = [f for f in os.listdir(test_folder) if f.endswith((".csv", ".json"))]
     if not files:
         raise FileNotFoundError("Файлы для теста не найдены")
@@ -48,7 +48,6 @@ def load_test_data(test_folder: str) -> list[pd.DataFrame]:
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
-            # Если это словарь — обернём его в список
             if isinstance(data, dict):
                 data = [data]
 
@@ -76,6 +75,9 @@ def predict():
         all_predictions.append(df_result)
 
     final_df = pd.concat(all_predictions)
+
+    final_df = final_df[["id", "prediction"]]
+
     os.makedirs(pred_dir, exist_ok=True)
     output_file = os.path.join(pred_dir, "predictions.csv")
     final_df.to_csv(output_file, index=False)
